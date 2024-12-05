@@ -4,6 +4,7 @@ import com.ll.util.Sql;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class SimpleDb {
@@ -14,46 +15,69 @@ public class SimpleDb {
 
     private Connection connection;
 
-    public void run(String query){
-        String url = "jdbc:mysql://"+host+":3306/"+ db;
-        try{
-            connection = DriverManager.getConnection(url, id, pw);
-            PreparedStatement ps = connection.prepareStatement(query);
-            ps.execute();
+    private String createDatabaseUrl() {
+        return String.format("jdbc:mysql://%s:3306/%s", host, db);
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+    private void connect() {
+        if (connection == null) {
             try {
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-               e.printStackTrace();
+                connection = DriverManager.getConnection(createDatabaseUrl(), id, pw);
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to connect to database", e);
             }
         }
     }
 
-    public void run(String query, String title, String body, boolean isBlind) {
-        String url = "jdbc:mysql://"+host+":3306/"+ db;
-        try{
-            connection = DriverManager.getConnection(url, id, pw);
-            PreparedStatement ps = connection.prepareStatement(query);
+    public void run(String query, Object... params) {
+        connect();
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            setPreparedStatementParameters(ps, params);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect to database" + query, e);
+        }
+    }
 
-            ps.setString(1, title);
-            ps.setString(2, body);
-            ps.setBoolean(3, isBlind);
+    private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            ps.setObject(i + 1, params[i]);
+        }
+    }
 
-            int rows = ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+    public void close() {
+        if (connection != null) {
             try {
-                if (connection != null) connection.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+                connection.close();
+            } catch (SQLException e) {
+                throw new RuntimeException("Failed to close database connection", e);
+            } finally {
+                connection = null;
             }
         }
     }
 
     public Sql genSql() {
+
+        return new Sql(this);
+    }
+
+    public long insert(String query, List<Object> params) {
+        connect();
+        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            setPreparedStatementParameters(ps, params.toArray());
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new RuntimeException("No generated key returned.");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
