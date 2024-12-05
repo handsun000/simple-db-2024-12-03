@@ -27,10 +27,14 @@ public class Sql {
     }
 
     public long insert() {
-        return simpleDb.insert(query.toString(), params.toArray());
+        return (long) simpleDb.dbCommand("INSERT", query.toString(), params.toArray());
     }
 
     public int update() {
-        return simpleDb.update(query.toString(), params.toArray());
+        return (int) simpleDb.dbCommand("UPDATE", query.toString(), params.toArray());
+    }
+
+    public int delete() {
+        return (int) simpleDb.dbCommand("DELETE", query.toString(), params.toArray());
     }
 }

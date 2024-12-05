@@ -14,9 +14,6 @@ public class SimpleDb {
 
     private Connection connection;
 
-    private final String INSERT = "INSERT";
-    private final String UPDATE = "UPDATE";
-
     private String createDatabaseUrl() {
         return String.format("jdbc:mysql://%s:3306/%s", host, db);
     }
@@ -40,20 +37,6 @@ public class SimpleDb {
         dbCommand("", query, params);
     }
 
-    private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
-        for (int i = 0; i < params.length; i++) {
-            ps.setObject(i + 1, params[i]);
-        }
-    }
-
-    public long insert(String query, Object... params) {
-        return (long) dbCommand(INSERT, query, params);
-    }
-
-    public int update(String query, Object... params) {
-        return (int) dbCommand(UPDATE, query, params);
-    }
-
     public Object dbCommand(String command, String query, Object... params) {
         connect();
         try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
@@ -70,12 +53,21 @@ public class SimpleDb {
                 case "UPDATE" -> {
                     return ps.executeUpdate();
                 }
+                case "DELETE" -> {
+                    return ps.executeUpdate();
+                }
                 default -> {
                     return ps.executeUpdate();
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
+        for (int i = 0; i < params.length; i++) {
+            ps.setObject(i + 1, params[i]);
         }
     }
 
