@@ -27,6 +27,10 @@ public class Sql {
     }
 
     public long insert() {
-        return simpleDb.insert(query.toString(), params);
+        return simpleDb.insert(query.toString(), params.toArray());
+    }
+
+    public int update() {
+        return simpleDb.update(query.toString(), params.toArray());
     }
 }
