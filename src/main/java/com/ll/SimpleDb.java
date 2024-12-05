@@ -48,22 +48,9 @@ public class SimpleDb {
 
             switch (command) {
                 case "SELECT" -> {
-                    List<Map<String,Object>> list = new ArrayList<>();
                     ps.executeQuery();
 
-                    ResultSet rs = ps.executeQuery();
-                    ResultSetMetaData metaData = rs.getMetaData();
-
-                    Map<String, Object> map = null;
-                    while(rs.next()) {
-                        map = new HashMap<>();
-                        for (int i = 1; i<= metaData.getColumnCount(); i++) {
-                            map.put(metaData.getColumnName(i), rs.getObject(i));
-                        }
-                        list.add(map);
-                    }
-                    if (list.size() == 1) return map;
-                    else return list;
+                    return ps.executeQuery();
                 }
                 case "INSERT" -> {
                     ps.executeUpdate();
