@@ -1,5 +1,6 @@
 package com.ll;
 
+import com.ll.util.Sql;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
@@ -51,5 +52,8 @@ public class SimpleDb {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Sql genSql() {
     }
 }
