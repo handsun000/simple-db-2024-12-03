@@ -50,8 +50,10 @@ public class SimpleDb {
                 case "SELECT" -> {
                     List<Map<String,Object>> list = new ArrayList<>();
                     ps.executeQuery();
+
                     ResultSet rs = ps.executeQuery();
                     ResultSetMetaData metaData = rs.getMetaData();
+
                     Map<String, Object> map = null;
                     while(rs.next()) {
                         map = new HashMap<>();
