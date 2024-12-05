@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Sql {
     private final SimpleDb simpleDb;
@@ -36,5 +37,10 @@ public class Sql {
 
     public int delete() {
         return (int) simpleDb.dbCommand("DELETE", query.toString(), params.toArray());
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectRows() {
+        return (List<Map<String, Object>>) simpleDb.dbCommand("SELECT", query.toString(),new Object[]{});
     }
 }

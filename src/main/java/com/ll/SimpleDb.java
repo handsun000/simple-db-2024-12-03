@@ -4,6 +4,10 @@ import com.ll.util.Sql;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 public class SimpleDb {
@@ -43,6 +47,22 @@ public class SimpleDb {
             if (params != null) setPreparedStatementParameters(ps, params);
 
             switch (command) {
+                case "SELECT" -> {
+                    List<Map<String,Object>> list = new ArrayList<>();
+                    ps.executeQuery();
+                    ResultSet rs = ps.executeQuery();
+                    ResultSetMetaData metaData = rs.getMetaData();
+
+                    while(rs.next()) {
+                        Map<String, Object> map = new HashMap<>();
+                        for (int i = 1; i<= metaData.getColumnCount(); i++) {
+                            map.put(metaData.getColumnName(i), rs.getObject(i));
+                        }
+                        list.add(map);
+                    }
+                    System.out.println(list);
+                    return list;
+                }
                 case "INSERT" -> {
                     ps.executeUpdate();
                     ResultSet rs = ps.getGeneratedKeys();
