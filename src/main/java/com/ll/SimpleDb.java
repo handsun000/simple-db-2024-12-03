@@ -52,16 +52,16 @@ public class SimpleDb {
                     ps.executeQuery();
                     ResultSet rs = ps.executeQuery();
                     ResultSetMetaData metaData = rs.getMetaData();
-
+                    Map<String, Object> map = null;
                     while(rs.next()) {
-                        Map<String, Object> map = new HashMap<>();
+                        map = new HashMap<>();
                         for (int i = 1; i<= metaData.getColumnCount(); i++) {
                             map.put(metaData.getColumnName(i), rs.getObject(i));
                         }
                         list.add(map);
                     }
-                    System.out.println(list);
-                    return list;
+                    if (list.size() == 1) return map;
+                    else return list;
                 }
                 case "INSERT" -> {
                     ps.executeUpdate();

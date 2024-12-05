@@ -41,6 +41,11 @@ public class Sql {
 
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> selectRows() {
-        return (List<Map<String, Object>>) simpleDb.dbCommand("SELECT", query.toString(),new Object[]{});
+        return (List<Map<String, Object>>) simpleDb.dbCommand("SELECT", query.toString(),params.toArray());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> selectRow() {
+        return (Map<String, Object>) simpleDb.dbCommand("SELECT", query.toString(),params.toArray());
     }
 }
