@@ -70,4 +70,9 @@ public class Sql {
         Map<String, Object> map = selectRow();
         return (String) map.get("title");
     }
+
+    public Boolean selectBoolean() {
+        Map<String, Object> map = selectRow();
+        return (Boolean) map.get("isBlind");
+    }
 }
