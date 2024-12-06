@@ -1,11 +1,8 @@
 package com.ll.simpleDb;
 
-import com.ll.SimpleDb;
 import com.ll.model.Article;
-import com.ll.util.Sql;
 import org.junit.jupiter.api.*;
 
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -520,5 +517,4 @@ public class SimpleDbTest {
 
         assertThat(newCount).isEqualTo(oldCount + 1);
     }
-}
 }

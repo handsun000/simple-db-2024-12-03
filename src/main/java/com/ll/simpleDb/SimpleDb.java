@@ -1,6 +1,5 @@
-package com.ll;
+package com.ll.simpleDb;
 
-import com.ll.util.Sql;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
@@ -117,6 +116,14 @@ public class SimpleDb {
     public void rollback() {
         try {
             getCurrentThreadConnection().rollback();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void commit() {
+        try {
+            getCurrentThreadConnection().commit();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

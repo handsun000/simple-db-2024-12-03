@@ -1,11 +1,8 @@
-package com.ll.util;
+package com.ll.simpleDb;
 
-import com.ll.SimpleDb;
-import com.ll.model.Article;
 import lombok.SneakyThrows;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 
