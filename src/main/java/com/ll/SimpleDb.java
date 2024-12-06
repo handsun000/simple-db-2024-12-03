@@ -4,10 +4,7 @@ import com.ll.util.Sql;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class SimpleDb {
@@ -43,6 +40,7 @@ public class SimpleDb {
 
     public Object dbCommand(String command, String query, Object... params) {
         connect();
+
         try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
             if (params != null) setPreparedStatementParameters(ps, params);
 
@@ -56,6 +54,7 @@ public class SimpleDb {
                         mappingData(metaData, row, rs);
                         resultList.add(row);
                     }
+                    System.out.println(resultList);
                     return resultList;
                 }
                 case "INSERT" -> {

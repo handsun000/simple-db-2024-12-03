@@ -1,12 +1,7 @@
 package com.ll.util;
 
 import com.ll.SimpleDb;
-import lombok.RequiredArgsConstructor;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -27,6 +22,20 @@ public class Sql {
             this.params.addAll(Arrays.asList(params));
         }
         return this;
+    }
+
+    public void appendIn(String query, Object... params) {
+        if (params != null) {
+            // params 개수만큼 생성
+            String placeHolder = String.join(",", Collections.nCopies(params.length, "?"));
+
+            int idx = query.indexOf('?');
+            if (idx != -1) {
+                String updateQuery = query.substring(0, idx) + placeHolder + query.substring(idx+1);
+                this.query.append(" ").append(updateQuery);
+                this.params.addAll(Arrays.asList(params));
+            }
+        }
     }
 
     public long insert() {
@@ -58,10 +67,6 @@ public class Sql {
         return (LocalDateTime) map.get("NOW()");
     }
 
-    private Object commonSql(String command) {
-        return simpleDb.dbCommand(command, query.toString(), params.toArray());
-    }
-
     public Long selectLong() {
         Map<String, Object> map = selectRow();
         String key = map.keySet().iterator().next();
@@ -85,5 +90,9 @@ public class Sql {
         else if (value instanceof Number) return ((Number) value).intValue() == 1;
 
         return (Boolean) map.get(key);
+    }
+
+    private Object commonSql(String command) {
+        return simpleDb.dbCommand(command, query.toString(), params.toArray());
     }
 }
