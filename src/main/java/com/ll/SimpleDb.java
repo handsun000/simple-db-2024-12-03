@@ -13,21 +13,35 @@ public class SimpleDb {
     private final String pw;
     private final String db;
 
-    private Connection connection;
+    private final Map<String, Connection> connections = new HashMap<>();
 
     private String createDatabaseUrl() {
         return String.format("jdbc:mysql://%s:3306/%s", host, db);
     }
 
-    private void connect() {
-        if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(createDatabaseUrl(), id, pw);
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to connect to database", e);
-            }
+    private Connection getCurrentThreadConnection() {
+        Connection connection = connections.get(Thread.currentThread().getName());
+
+        if (connection != null) return connection;
+        try {
+            connection = DriverManager.getConnection(createDatabaseUrl(), id, pw);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to connect to database", e);
         }
+        connections.put(Thread.currentThread().getName(), connection);
+
+        return connection;
     }
+
+//    private void connect() {
+//        if (connection == null) {
+//            try {
+//                connection = DriverManager.getConnection(createDatabaseUrl(), id, pw);
+//            } catch (SQLException e) {
+//                throw new RuntimeException("Failed to connect to database", e);
+//            }
+//        }
+//    }
 
     public Sql genSql() {
 
@@ -39,9 +53,7 @@ public class SimpleDb {
     }
 
     public Object dbCommand(String command, String query, Object... params) {
-        connect();
-
-        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)){
+        try (PreparedStatement ps = getCurrentThreadConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             if (params != null) setPreparedStatementParameters(ps, params);
 
             switch (command) {
@@ -54,7 +66,6 @@ public class SimpleDb {
                         mappingData(metaData, row, rs);
                         resultList.add(row);
                     }
-                    System.out.println(resultList);
                     return resultList;
                 }
                 case "INSERT" -> {
@@ -79,26 +90,31 @@ public class SimpleDb {
         }
     }
 
+    public void close() {
+        clearCurrentThreadConnection();
+    }
+
+    private void clearCurrentThreadConnection() {
+        Connection connection = connections.get(Thread.currentThread().getName());
+        if (connection == null) return;
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            connections.remove(Thread.currentThread().getName());
+        }
+    }
+
     private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             ps.setObject(i + 1, params[i]);
         }
     }
+
     private static void mappingData(ResultSetMetaData metaData, Map<String, Object> map, ResultSet rs) throws SQLException {
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
             map.put(metaData.getColumnName(i), rs.getObject(i));
-        }
-    }
-
-    public void close() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                throw new RuntimeException("Failed to close database connection", e);
-            } finally {
-                connection = null;
-            }
         }
     }
 }

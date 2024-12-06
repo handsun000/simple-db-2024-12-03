@@ -121,6 +121,10 @@ public class Sql {
         return (T) mapToClass(selectRow(), cls);
     }
 
+    private Object commonSql(String command) {
+        return simpleDb.dbCommand(command, query.toString(), params.toArray());
+    }
+
     @SneakyThrows
     private <T> T mapToClass(Map<String, Object> row, Class<T> cls) {
         T obj = cls.getDeclaredConstructor().newInstance();
@@ -133,9 +137,5 @@ public class Sql {
             }
         }
         return obj;
-    }
-
-    private Object commonSql(String command) {
-        return simpleDb.dbCommand(command, query.toString(), params.toArray());
     }
 }
