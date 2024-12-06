@@ -73,6 +73,14 @@ public class Sql {
 
     public Boolean selectBoolean() {
         Map<String, Object> map = selectRow();
-        return (Boolean) map.get("isBlind");
+
+        String key = map.keySet().iterator().next();
+
+        Object value = map.get(key);
+
+        if (value instanceof Boolean) return (Boolean) value;
+        else if (value instanceof Number) return ((Number) value).intValue() == 1;
+
+        return (Boolean) map.get(key);
     }
 }
