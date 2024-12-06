@@ -2,7 +2,10 @@ package com.ll.util;
 
 import com.ll.SimpleDb;
 import com.ll.model.Article;
+import lombok.SneakyThrows;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -111,10 +114,24 @@ public class Sql {
         return result;
     }
 
-    public List<Article> selectRows(Class<Article> article) {
+    public <T> List<T> selectRows(Class<?> cls) {
         return selectRows()
                 .stream()
-                .map(Article::new)
+                .map(row -> (T) mapToClass(row, cls))
                 .toList();
+    }
+
+    @SneakyThrows
+    private <T> T mapToClass(Map<String, Object> row, Class<T> cls) {
+        T obj = cls.getDeclaredConstructor().newInstance();
+
+        for (Field field : cls.getDeclaredFields()) {
+            field.setAccessible(true);
+            Object value = row.get(field.getName());
+            if (value != null) {
+                field.set(obj, value);
+            }
+        }
+        return obj;
     }
 }

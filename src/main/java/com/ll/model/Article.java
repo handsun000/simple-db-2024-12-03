@@ -17,12 +17,4 @@ public class Article {
     private LocalDateTime modifiedDate;
     private boolean isBlind;
 
-    public Article(Map<String, Object> row) {
-        this.id = (Long) row.get("id");
-        this.title = (String) row.get("title");
-        this.body = (String) row.get("body");
-        this.createdDate = (LocalDateTime) row.get("createdDate");
-        this.modifiedDate = (LocalDateTime) row.get("modifiedDate");
-        this.isBlind = (boolean) row.get("isBlind");
-    }
 }
