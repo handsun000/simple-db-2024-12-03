@@ -1,6 +1,7 @@
 package com.ll.util;
 
 import com.ll.SimpleDb;
+import com.ll.model.Article;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -108,5 +109,12 @@ public class Sql {
         }
 
         return result;
+    }
+
+    public List<Article> selectRows(Class<Article> article) {
+        return selectRows()
+                .stream()
+                .map(Article::new)
+                .toList();
     }
 }

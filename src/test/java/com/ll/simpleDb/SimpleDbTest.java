@@ -1,6 +1,7 @@
 package com.ll.simpleDb;
 
 import com.ll.SimpleDb;
+import com.ll.model.Article;
 import com.ll.util.Sql;
 import org.junit.jupiter.api.*;
 
