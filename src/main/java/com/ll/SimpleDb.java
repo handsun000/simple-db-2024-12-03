@@ -106,6 +106,22 @@ public class SimpleDb {
         }
     }
 
+    public void startTransaction() {
+        try {
+            getCurrentThreadConnection().setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void rollback() {
+        try {
+            getCurrentThreadConnection().rollback();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             ps.setObject(i + 1, params[i]);
