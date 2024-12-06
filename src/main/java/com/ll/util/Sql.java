@@ -65,4 +65,9 @@ public class Sql {
         Map<String, Object> map = selectRow();
         return (Long) map.get("id");
     }
+
+    public String selectString() {
+        Map<String, Object> map = selectRow();
+        return (String) map.get("title");
+    }
 }
