@@ -48,9 +48,15 @@ public class SimpleDb {
 
             switch (command) {
                 case "SELECT" -> {
-                    ps.executeQuery();
-
-                    return ps.executeQuery();
+                    ResultSet rs = ps.executeQuery();
+                    List<Map<String, Object>> resultList = new ArrayList<>();
+                    ResultSetMetaData metaData = rs.getMetaData();
+                    while (rs.next()) {
+                        Map<String, Object> row = new HashMap<>();
+                        mappingData(metaData, row, rs);
+                        resultList.add(row);
+                    }
+                    return resultList;
                 }
                 case "INSERT" -> {
                     ps.executeUpdate();
@@ -77,6 +83,11 @@ public class SimpleDb {
     private static void setPreparedStatementParameters(PreparedStatement ps, Object[] params) throws SQLException {
         for (int i = 0; i < params.length; i++) {
             ps.setObject(i + 1, params[i]);
+        }
+    }
+    private static void mappingData(ResultSetMetaData metaData, Map<String, Object> map, ResultSet rs) throws SQLException {
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+            map.put(metaData.getColumnName(i), rs.getObject(i));
         }
     }
 

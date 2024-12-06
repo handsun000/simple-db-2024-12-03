@@ -39,48 +39,30 @@ public class Sql {
     public int delete() {
         return (int) commonSql("DELETE");
     }
-    
-    public List<Map<String, Object>> selectRows() {
-        List<Map<String, Object>> list = new ArrayList<>();
-        
-        ResultSet rs = (ResultSet) commonSql("SELECT");
-        try {
-            ResultSetMetaData metaData = rs.getMetaData();
-            while(rs.next()) {
-                Map<String, Object> map = new HashMap<>();
-                mappingData(metaData, map, rs);
-                list.add(map);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
 
-        return list;
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectRows() {
+        return (List<Map<String, Object>>)commonSql("SELECT");
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> selectRow() {
-        Map<String, Object> map = new HashMap<>();
-        ResultSet rs = (ResultSet) commonSql("SELECT");
-        try {
-            ResultSetMetaData metaData = rs.getMetaData();
-            mappingData(metaData, map, rs);
-        }catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return map;
+        List<Map<String, Object>> list = (List<Map<String, Object>>)commonSql("SELECT");
+        return list.get(0);
     }
 
     public LocalDateTime selectDatetime() {
-        return (LocalDateTime) commonSql("SELECT");
-    }
+        Map<String, Object> map = selectRow();
 
-    private static void mappingData(ResultSetMetaData metaData, Map<String, Object> map, ResultSet rs) throws SQLException {
-        for (int i = 1; i<= metaData.getColumnCount(); i++) {
-            map.put(metaData.getColumnName(i), rs.getObject(i));
-        }
+        return (LocalDateTime) map.get("NOW()");
     }
 
     private Object commonSql(String command) {
         return simpleDb.dbCommand(command, query.toString(), params.toArray());
+    }
+
+    public Long selectLong() {
+        Map<String, Object> map = selectRow();
+        return (Long) map.get("id");
     }
 }
