@@ -24,18 +24,19 @@ public class Sql {
         return this;
     }
 
-    public void appendIn(String query, Object... params) {
+    public Sql appendIn(String query, Object... params) {
         if (params != null) {
             // params 개수만큼 생성
             String placeHolder = String.join(",", Collections.nCopies(params.length, "?"));
 
             int idx = query.indexOf('?');
             if (idx != -1) {
-                String updateQuery = query.substring(0, idx) + placeHolder + query.substring(idx+1);
+                String updateQuery = query.substring(0, idx) + placeHolder + query.substring(idx + 1);
                 this.query.append(" ").append(updateQuery);
                 this.params.addAll(Arrays.asList(params));
             }
         }
+        return this;
     }
 
     public long insert() {
@@ -52,12 +53,12 @@ public class Sql {
 
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> selectRows() {
-        return (List<Map<String, Object>>)commonSql("SELECT");
+        return (List<Map<String, Object>>) commonSql("SELECT");
     }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> selectRow() {
-        List<Map<String, Object>> list = (List<Map<String, Object>>)commonSql("SELECT");
+        List<Map<String, Object>> list = (List<Map<String, Object>>) commonSql("SELECT");
         return list.get(0);
     }
 
@@ -94,5 +95,18 @@ public class Sql {
 
     private Object commonSql(String command) {
         return simpleDb.dbCommand(command, query.toString(), params.toArray());
+    }
+
+    public List<Long> selectLongs() {
+        List<Long> result = new ArrayList<>();
+
+        List<Map<String, Object>> list = selectRows();
+        for (Map<String, Object> map : list) {
+            for (String key : map.keySet()) {
+                result.add((Long) map.get(key));
+            }
+        }
+
+        return result;
     }
 }
