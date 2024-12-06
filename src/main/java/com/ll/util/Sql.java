@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -63,7 +64,9 @@ public class Sql {
 
     public Long selectLong() {
         Map<String, Object> map = selectRow();
-        return (Long) map.get("id");
+        String key = map.keySet().iterator().next();
+
+        return (Long) map.get(key);
     }
 
     public String selectString() {
